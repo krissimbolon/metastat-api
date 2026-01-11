@@ -55,7 +55,14 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/auth/**")
                         .permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+                        .requestMatchers(
+                            "/swagger-ui/**", 
+                            "/v3/api-docs/**", 
+                            "/swagger-ui.html",
+                            "/swagger-resources/**",
+                            "/webjars/**",
+                            "/actuator/**"
+                        )
                         .permitAll()
                         .requestMatchers("/h2-console/**")
                         .permitAll()
@@ -64,13 +71,16 @@ public class SecurityConfig {
                             "/api/activities/**",
                             "/api/domains/**",
                             "/api/subjects/**",
-                            "/api/organizations/**")
+                            "/api/organizations/**",
+                            "/api/variables/activities/**",
+                            "/api/publications/activities/**",
+                            "/api/publications/{id}/download")
                         .permitAll()
                         .requestMatchers("/api/dataflow/**", "/api/concepts/**", "/api/metadata/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated());
-        
+
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())); // For H2 console
         

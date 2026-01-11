@@ -4,6 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -78,9 +81,11 @@ public class JwtTokenProvider {
 
   public Boolean validateToken(String token) {
     try {
-      return !isTokenExpired(token);
-    } catch (Exception e) {
-      return false;
+        return !isTokenExpired(token);
+    } catch (ExpiredJwtException e) {
+        return false;
+    } catch (MalformedJwtException | SignatureException e) {
+        return false;
     }
   }
 }

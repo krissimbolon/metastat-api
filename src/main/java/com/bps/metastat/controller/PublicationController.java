@@ -6,6 +6,9 @@ import com.bps.metastat.dto.response.ApiResponse;
 import com.bps.metastat.dto.response.PublicationResponseDTO;
 import com.bps.metastat.service.PublicationService;
 import com.bps.metastat.service.UserService;
+import com.bps.metastat.domain.entity.Publication;
+import com.bps.metastat.domain.repository.PublicationRepository;
+import com.bps.metastat.exception.EntityNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +31,7 @@ public class PublicationController {
 
   private final PublicationService publicationService;
   private final UserService userService;
+  private final PublicationRepository publicationRepository;
 
   @GetMapping("/activities/{activityId}")
   @Operation(summary = "List publications by activity", description = "Get all publications for a specific activity. Public endpoint.")
@@ -70,4 +74,37 @@ public class PublicationController {
 
     return ResponseEntity.noContent().build();
   }
+
+  @PutMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
+  @Operation(
+      summary = "Update publication",
+      description = "Update publication metadata. Requires authentication and ownership.",
+      security = @SecurityRequirement(name = "Bearer Authentication"))
+  public ResponseEntity<ApiResponse<PublicationResponseDTO>> updatePublication(
+      @PathVariable Long id,
+      @Valid @RequestBody PublicationRequestDTO request,
+      @AuthenticationPrincipal UserDetails currentUser) {
+
+    User user = userService.getCurrentUserEntity(currentUser.getUsername());
+    PublicationResponseDTO result = publicationService.update(id, request, user);
+
+    return ResponseEntity.ok(ApiResponse.success(result, "Publication updated successfully"));
+  }
+
+  @GetMapping("/{id}/download")
+  @Operation(
+      summary = "Get download URL",
+      description = "Get publication download URL. Public endpoint.")
+  public ResponseEntity<ApiResponse<String>> getDownloadUrl(@PathVariable Long id) {
+    // For now, just return the URL from database
+    // In production, this could serve actual files or redirect
+    Publication publication = publicationRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Publication not found"));
+    
+    return ResponseEntity.ok(
+        ApiResponse.success(publication.getDownloadUrl(), "Download URL retrieved")
+    );
+  }
+
 }
