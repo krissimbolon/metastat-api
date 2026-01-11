@@ -1,81 +1,113 @@
-# ![RealWorld Example App using Kotlin and Spring](example-logo.png)
+# Metastat API
 
-[![Actions](https://github.com/gothinkster/spring-boot-realworld-example-app/workflows/Java%20CI/badge.svg)](https://github.com/gothinkster/spring-boot-realworld-example-app/actions)
+Sistem Manajemen Metadata Statistik - Spring Boot REST API
 
-> ### Spring boot + MyBatis codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
+## Tech Stack
 
-This codebase was created to demonstrate a fully fledged full-stack application built with Spring boot + Mybatis including CRUD operations, authentication, routing, pagination, and more.
+- Spring Boot 3.4.1
+- Java 21
+- MySQL 8.0
+- JWT Authentication
+- MapStruct
+- OpenAPI/Swagger
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+## Features
 
-# *NEW* GraphQL Support  
+- JWT authentication
+- Role-based access (ADMIN/USER)
+- Statistical activity management
+- Domain and subject classification
+- Concept and variable metadata
+- Publication tracking
+- Pagination support
 
-Following some DDD principles. REST or GraphQL is just a kind of adapter. And the domain layer will be consistent all the time. So this repository implement GraphQL and REST at the same time.
+## Quick Start
 
-The GraphQL schema is https://github.com/gothinkster/spring-boot-realworld-example-app/blob/master/src/main/resources/schema/schema.graphqls and the visualization looks like below.
+1. Clone repository:
+   git clone https://github.com/krissimbolon/metastat-api.git
+   cd metastat-api
 
-![](graphql-schema.png)
+2. Create database:
+   CREATE DATABASE metastat_db;
+   CREATE USER 'metastat_user'@'localhost' IDENTIFIED BY 'metastat_pass';
+   GRANT ALL PRIVILEGES ON metastat_db.* TO 'metastat_user'@'localhost';
 
-And this implementation is using [dgs-framework](https://github.com/Netflix/dgs-framework) which is a quite new java graphql server framework.
-# How it works
+3. Run application:
+   ./gradlew bootRun
 
-The application uses Spring Boot (Web, Mybatis).
+4. Access:
+   - API: http://localhost:8082
+   - Swagger: http://localhost:8082/swagger-ui.html
+   - Docs: http://localhost:8082/v3/api-docs
 
-* Use the idea of Domain Driven Design to separate the business term and infrastructure term.
-* Use MyBatis to implement the [Data Mapper](https://martinfowler.com/eaaCatalog/dataMapper.html) pattern for persistence.
-* Use [CQRS](https://martinfowler.com/bliki/CQRS.html) pattern to separate the read model and write model.
+## Default Users
 
-And the code is organized as this:
+- Admin: admin@bps.go.id / admin123
+- User: user@bps.go.id / user123
 
-1. `api` is the web layer implemented by Spring MVC
-2. `core` is the business model including entities and services
-3. `application` is the high-level services for querying the data transfer objects
-4. `infrastructure`  contains all the implementation classes as the technique details
+## API Endpoints
 
-# Security
+Authentication:
+  POST /auth/login
+  POST /auth/register
+  GET  /auth/me
 
-Integration with Spring Security and add other filter for jwt token process.
+Activities:
+  GET    /api/activities
+  GET    /api/activities/{id}
+  POST   /api/activities
+  PUT    /api/activities/{id}
+  DELETE /api/activities/{id}
+  PATCH  /api/activities/{id}/status
 
-The secret key is stored in `application.properties`.
+Domains & Subjects:
+  GET /api/domains
+  GET /api/subjects
 
-# Database
+Variables & Publications:
+  GET  /api/variables
+  POST /api/variables
+  GET  /api/publications
+  POST /api/publications
 
-It uses a ~~H2 in-memory database~~ sqlite database (for easy local test without losing test data after every restart), can be changed easily in the `application.properties` for any other database.
+## Testing
 
-# Getting started
+Login:
+  curl -X POST http://localhost:8082/auth/login -H "Content-Type: application/json" -d '{"email":"admin@bps.go.id","password":"admin123"}'
 
-You'll need Java 11 installed.
+Get Activities:
+  curl http://localhost:8082/api/activities -H "Authorization: Bearer YOUR_TOKEN"
 
-    ./gradlew bootRun
+## Project Structure
 
-To test that it works, open a browser tab at http://localhost:8080/tags .  
-Alternatively, you can run
+src/main/java/com/bps/metastat/
+  - config/         Configuration classes
+  - controller/     REST endpoints
+  - domain/
+    - entity/       JPA entities
+    - repository/   Data access
+  - dto/            Request/Response objects
+  - service/        Business logic
+  - security/       JWT authentication
+  - exception/      Error handling
 
-    curl http://localhost:8080/tags
+## Database
 
-# Try it out with [Docker](https://www.docker.com/)
+Tables: users, statistical_activities, domains, subject_categories, organizations, publications, variables, concepts, indicators
 
-You'll need Docker installed.
-	
-    ./gradlew bootBuildImage --imageName spring-boot-realworld-example-app
-    docker run -p 8081:8080 spring-boot-realworld-example-app
+## Security
 
-# Try it out with a RealWorld frontend
+- JWT token authentication
+- BCrypt password encryption
+- Role-based authorization
+- CORS enabled
 
-The entry point address of the backend API is at http://localhost:8080, **not** http://localhost:8080/api as some of the frontend documentation suggests.
+## Mobile Integration
 
-# Run test
+Designed for Android consumption with consistent JSON responses and proper error handling.
 
-The repository contains a lot of test cases to cover both api test and repository test.
+## Author
 
-    ./gradlew test
-
-# Code format
-
-Use spotless for code format.
-
-    ./gradlew spotlessJavaApply
-
-# Help
-
-Please fork and PR to improve the project.
+Teguh Christianto Simbolon - 222313403
+UAS Pemrograman Platform Khusus (PPK)
+Politeknik Statistika STIS - 2026
