@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+gradle/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application
+application-local.yml
+*.log
